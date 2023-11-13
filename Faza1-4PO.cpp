@@ -123,7 +123,7 @@ public:
 
     friend ostream& operator<<(ostream& monitor, const Apartament& apartament) {
 
-        monitor << "Adresa: " << apartament.GetAdresa() << endl;
+        monitor << "Adresa: " << apartament.adresa << endl;
         monitor << "An de constructie: " << apartament.anConstructie << endl;
         monitor << "Numar de camere: " << apartament.numarCamere << endl;
         monitor << "Pret: " << apartament.pret << " RON" << endl << "Suprafata utila a camerelor: ";
@@ -136,6 +136,31 @@ public:
             monitor << "-" << endl;
         }
         return monitor;
+    }
+
+    friend istream& operator>>(istream& tastatura,  Apartament& apartament) {
+
+        cout << "Introduceti adresa apartamentului: ";
+        tastatura >> apartament.adresa;
+
+        cout << "Introduceti anul de constructie: ";
+        tastatura >> apartament.anConstructie;
+
+        cout << "Introduceti numarul de camere: ";
+        tastatura >> apartament.numarCamere;
+
+        cout << "Introduceti pretul apartamentului: ";
+        tastatura >> apartament.pret;
+
+
+        apartament.suprafataUtila = new int[apartament.numarCamere];
+
+        for (int i = 0; i < apartament.numarCamere; ++i) {
+            cout << "Introduceti suprafata utila pentru etajul " << i + 1 << ": ";
+            tastatura >> apartament.suprafataUtila[i];
+        }
+
+        return tastatura;
     }
 
     friend Apartament operator+(double pret, const Apartament s) {
@@ -276,7 +301,7 @@ public:
         monitor << "Adresa: " << casa.adresa << endl;
         monitor << "An de constructie: " << casa.anConstructie << endl;
         monitor << "Numar de camere: " << casa.numarCamere << endl;
-        monitor << "Suprafata curtii: " << casa.suprafataCurte << " mp" << endl << "Suprafata Curte proprie: ";
+        monitor << "Suprafata curtii: " << casa.suprafataCurte << " mp" << endl << "Suprafata proprie: ";
 
         if (casa.suprafataCurteProprie != NULL)
         {
@@ -287,6 +312,32 @@ public:
             monitor << "-" << endl;
         }
         return monitor;
+    }
+
+    friend istream& operator>>(istream& tastatura, Casa& casa) {
+        
+        cout << "Introduceti adresa casei: ";
+        tastatura >> casa.adresa;
+
+        cout << "Introduceti anul de constructie: ";
+        tastatura >> casa.anConstructie;
+
+        cout << "Introduceti numarul de camere: ";
+        tastatura >> casa.numarCamere;
+
+        cout << "Introduceti suprafata curtii: ";
+        tastatura >> casa.suprafataCurte;
+
+       
+        casa.suprafataCurteProprie = new int[casa.numarCamere];
+
+        
+        for (int i = 0; i < casa.numarCamere; ++i) {
+            cout << "Introduceti suprafata pentru etajul " << i + 1 << ": ";
+            tastatura >> casa.suprafataCurteProprie[i];
+        }
+
+        return tastatura;
     }
     friend bool operator>(Casa& s, const Casa& p) {
         return s.anConstructie > p.anConstructie;
@@ -434,6 +485,29 @@ public:
         }
         return monitor;
     }
+
+    friend istream& operator>>(istream& tastatura, Hotel& hotel) {
+        
+        cout << "Introduceti numele hotelului: ";
+        tastatura >> hotel.nume;
+        cout << "Introduceti numarul de etaje: ";
+        tastatura >> hotel.numarEtaje;
+
+        cout << "Hotelul are restaurant? (1 pentru Da, 0 pentru Nu): ";
+        tastatura >> hotel.restaurant;
+
+        
+        hotel.CamereEtaj = new int[hotel.numarEtaje];
+
+        
+        for (int i = 0; i < hotel.numarEtaje; ++i) {
+            cout << "Introduceti numarul de camere pentru etajul " << i + 1 << ": ";
+            tastatura >> hotel.CamereEtaj[i];
+        }
+
+        return tastatura;
+    }
+
     friend bool operator>(Hotel& s, const Hotel& p) {
         return s.numarEtaje > p.numarEtaje;
     }
@@ -498,7 +572,22 @@ void main() {
     }
     Apartament apartament15(150000.0);
     cout << "\nImpozitul pe proprietate al apartamentului 15 este " << CalculImpozitProprietate(apartament15) << "."<<endl;
-    
+
+    int ap;
+    cout << "Inserati numarul de obiecte: " << endl;
+    cin >> ap;
+    Apartament* vectorApartament = new Apartament[ap];
+    for (int i = 0; i < ap; i++)
+    {
+        cout << "Introduceti detaliile apartamentului " << i + 1 << ": " << endl;
+        cin >> vectorApartament[i];
+    }
+    cout << endl;
+    for (int i = 0; i < ap; i++) {
+        cout << "Apartamentul " << i + 1 << ": " << endl;
+        cout << vectorApartament[i] << endl;
+    }
+    delete[]vectorApartament;
 
     Casa casa1;
     Casa casa2("Strada X, Nr. 123", 4);
@@ -550,7 +639,21 @@ void main() {
         cout << "\nCasa 13 are o suprafata mai mare decat casa 14.";
     Casa casa15("Strada Plevnei");
     cout << "\nNoua adresa a casei 15 este  " << NouaAdresa(casa15, "Strada Navodari") << "." << endl;
-
+    int cas;
+    cout << "Inserati numarul de obiecte: " << endl;
+    cin >> cas;
+    Casa* vectorCasa = new Casa[cas];
+    for (int i = 0; i < cas; i++)
+    {
+        cout << "Introduceti detaliile casei " << i + 1 << ": " << endl;
+        cin >> vectorCasa[i];
+    }
+    cout << endl;
+    for (int i = 0; i < cas; i++) {
+        cout << "Casa " << i + 1 << ": " << endl;
+        cout << vectorCasa[i];
+    }
+    delete[]vectorCasa;
 
 
 
@@ -599,4 +702,44 @@ void main() {
     else
         cout << "\nHotelul 13 are mai putine etaje decat hotelul 12.";
         
+
+    int nr;
+    cout << "Inserati numarul de obiecte: " << endl;
+    cin >> nr;
+    Hotel* vectorHotel = new Hotel[nr];
+    for (int i = 0; i < nr; i++)
+    {
+        cout << "Introduceti detaliile hotelului " << i + 1 << ": " << endl;
+        cin >> vectorHotel[i];
+    }
+    cout << endl;
+    for (int i = 0; i < nr; i++) {
+        cout << "Hotelul " << i + 1 << ": " << endl;
+        cout << vectorHotel[i];
+    }
+    delete[]vectorHotel;
+
+    const int linii = 2; 
+    const int coloane = 2; 
+
+    Hotel hotelMatrice[linii][coloane];
+
+   
+    for (int i = 0; i < linii; ++i) {
+        for (int j = 0; j < coloane; ++j) {
+            cout << "Introduceti detaliile hotelului [" << i + 1 << "][" << j + 1 << "]:\n";
+            cin >> hotelMatrice[i][j];
+        }
+    }
+
+    
+    for (int i = 0; i < linii; ++i) {
+        for (int j = 0; j < coloane; ++j) {
+            cout << "Hotel [" << i + 1 << "][" << j + 1 << "]:\n";
+            cout << hotelMatrice[i][j] << "\n";
+        }
+    }
+
+    
 }
+    

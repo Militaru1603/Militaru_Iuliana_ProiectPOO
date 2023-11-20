@@ -94,24 +94,25 @@ public:
     }
 
 
-    Apartament& operator=(const Apartament& other) {
-        if (this != &other) {
-            this->adresa = other.adresa;
-            this->anConstructie = other.anConstructie;
-            this->numarCamere = other.numarCamere;
-            this->pret = other.pret;
+    Apartament& operator=(const Apartament& s) {
+        if (this != &s) {
+            this->adresa = s.adresa;
+            this->anConstructie = s.anConstructie;
+            this->numarCamere = s.numarCamere;
+            this->pret = s.pret;
             if (this->suprafataUtila != NULL) {
-                delete[] this->suprafataUtila;
+                delete[]this->suprafataUtila;
             }
             this->suprafataUtila = new int[this->numarCamere];
             for (int i = 0; i < this->numarCamere; i++) {
-                this->suprafataUtila[i] = other.suprafataUtila[i];
+                this->suprafataUtila[i] = s.suprafataUtila[i];
             }
         }
         return *this;
     }
     ~Apartament() {
-        delete suprafataUtila;
+        if(this->suprafataUtila!=NULL)
+        delete[]this->suprafataUtila;
     }
 
     static void setGradAmenajare(int grad) {
@@ -156,7 +157,7 @@ public:
         apartament.suprafataUtila = new int[apartament.numarCamere];
 
         for (int i = 0; i < apartament.numarCamere; ++i) {
-            cout << "Introduceti suprafata utila pentru etajul " << i + 1 << ": ";
+            cout << "Introduceti suprafata utila pentru camera " << i + 1 << ": ";
             tastatura >> apartament.suprafataUtila[i];
         }
 
@@ -521,6 +522,84 @@ public:
 
 int Hotel::numarCamereMediu = 100;
 
+class Bloc {
+private:
+    Apartament* apartament;
+    int numarEtajeBloc;
+    bool lift;
+
+public:
+    const Apartament* GetApartament() const {
+        return apartament;
+    }
+
+    int GetNumarEtajeBloc() const {
+        return numarEtajeBloc;
+    }
+
+    bool HasLift() const {
+        return lift;
+    }
+
+    void SetApartament(const Apartament& apartament) {
+        this->apartament = new Apartament(apartament);
+    }
+
+    void SetNumarEtajeBloc(int numarEtajeBloc) {
+        this->numarEtajeBloc = numarEtajeBloc;
+    }
+
+    void SetLift(bool lift) {
+        this->lift = lift;
+    }
+    Bloc() {
+        this->apartament = NULL;
+        this->numarEtajeBloc = 0;
+        this->lift = false;
+    }
+
+    Bloc( Apartament* apartament, int numarEtajeBloc, bool lift) {
+        this->apartament = apartament;
+        this->numarEtajeBloc = numarEtajeBloc;
+        this->lift = lift;
+    }
+   
+    ~Bloc() {
+        if (apartament != NULL)
+            delete[]this->apartament;
+    }
+    Bloc& operator=(const Bloc& s) {
+        if (this != &s) { 
+            delete apartament;
+            apartament = new Apartament(*s.apartament);
+            numarEtajeBloc = s.numarEtajeBloc;
+            lift = s.lift;
+        }
+        return *this;
+    }
+    friend istream& operator>>(istream& mouse, Bloc& bloc) {  
+        cout << "Introduceti apartamentul" << endl;
+            delete[]bloc.apartament;
+        bloc.apartament = new Apartament;
+        mouse >> *(bloc.apartament);      
+        cout << "Introduceti numarul de etaje al blocului: " << endl;
+        mouse >> bloc.numarEtajeBloc;
+        cout << "Blocul are lift? (1 pentru Da, 0 pentru Nu): " << endl;
+        mouse >> bloc.lift;
+        return mouse;
+    }
+
+    
+    friend ostream& operator<<(ostream& see, const Bloc& bloc) {
+        
+        see << "Detalii Apartament:\n" << *(bloc.apartament);
+        see << "Numar de etaje al blocului: " << bloc.numarEtajeBloc << "\n";
+        see << "Blocul " << (bloc.lift ? "are" : "nu are") << " lift.\n";
+
+        return see;
+    }
+
+};
 void main() {
     Apartament::setGradAmenajare(4);
     Casa::setSuprafataCurteMedie(250);
@@ -739,6 +818,12 @@ void main() {
             cout << hotelMatrice[i][j] << "\n";
         }
     }
+Bloc b1;
+cin >> b1;
+cout << b1;
+Bloc b2;
+b2 = b1;
+cout << b2;
 
     
 }

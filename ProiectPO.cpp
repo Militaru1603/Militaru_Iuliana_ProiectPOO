@@ -522,84 +522,94 @@ public:
 
 int Hotel::numarCamereMediu = 100;
 
-class Bloc {
-private:
-    Apartament* apartament;
-    int numarEtajeBloc;
-    bool lift;
-
-public:
-    const Apartament* GetApartament() const {
-        return apartament;
-    }
-
-    int GetNumarEtajeBloc() const {
-        return numarEtajeBloc;
-    }
-
-    bool HasLift() const {
-        return lift;
-    }
-
-    void SetApartament(const Apartament& apartament) {
-        this->apartament = new Apartament(apartament);
-    }
-
-    void SetNumarEtajeBloc(int numarEtajeBloc) {
-        this->numarEtajeBloc = numarEtajeBloc;
-    }
-
-    void SetLift(bool lift) {
-        this->lift = lift;
-    }
-    Bloc() {
-        this->apartament = NULL;
-        this->numarEtajeBloc = 0;
-        this->lift = false;
-    }
-
-    Bloc( Apartament* apartament, int numarEtajeBloc, bool lift) {
-        this->apartament = apartament;
-        this->numarEtajeBloc = numarEtajeBloc;
-        this->lift = lift;
-    }
-   
-    ~Bloc() {
-        if (apartament != NULL)
-            delete[]this->apartament;
-    }
-    Bloc& operator=(const Bloc& s) {
-        if (this != &s) { 
-            delete apartament;
-            apartament = new Apartament(*s.apartament);
-            numarEtajeBloc = s.numarEtajeBloc;
-            lift = s.lift;
-        }
-        return *this;
-    }
-    friend istream& operator>>(istream& mouse, Bloc& bloc) {  
-        cout << "Introduceti apartamentul" << endl;
-            delete[]bloc.apartament;
-        bloc.apartament = new Apartament;
-        mouse >> *(bloc.apartament);      
-        cout << "Introduceti numarul de etaje al blocului: " << endl;
-        mouse >> bloc.numarEtajeBloc;
-        cout << "Blocul are lift? (1 pentru Da, 0 pentru Nu): " << endl;
-        mouse >> bloc.lift;
-        return mouse;
-    }
-
+class StatiunecuHoteluri {
+    private:
+        string numeStatiune;
+    	int nrHoteluri;
+    	Hotel* hoteluri;
     
-    friend ostream& operator<<(ostream& see, const Bloc& bloc) {
+    public:
+
+        void setNumeStatiune(string numeStatiune) {
+            this->numeStatiune = numeStatiune;
+        }
+        string getNumeStatiune() {
+            return this->numeStatiune;
+        }
+        void setNrHoteluri(int nr) {
+            this->nrHoteluri = nr;
+        }
+        int getNrHoteluri() {
+            return this->nrHoteluri;
+        }
+        void setHoteluri(const Hotel& hoteluri) {
+            this->hoteluri = new Hotel(hoteluri);
+         }
+       const  Hotel* getHoteluri() {
+            return this->hoteluri;
+        }
+        class StatiunecuHoteluri() {
+            this->numeStatiune = "Sinaia";
+    		this->nrHoteluri = 3;
+    		this->hoteluri = new Hotel[3];
+    	}
+        class StatiunecuHoteluri(string numeStatiune, int nrHoteluri, Hotel& hoteluri) {
+            this->numeStatiune = numeStatiune;
+            this->nrHoteluri = nrHoteluri;
+            this->hoteluri = new Hotel(hoteluri);
+        }
+        ~StatiunecuHoteluri() {
+            if (this->hoteluri) {
+                delete[]this->hoteluri;
+            }
+        }
+        StatiunecuHoteluri& operator=(const StatiunecuHoteluri& h) {
+            if (this != &h) {
+                delete[]hoteluri;
+                numeStatiune = h.numeStatiune;
+                nrHoteluri = h.nrHoteluri;
+                hoteluri = new Hotel[nrHoteluri];
+                for (int i = 0; i < nrHoteluri; ++i) {
+                    hoteluri[i] = h.hoteluri[i];
+                }
+            }
+            return *this;
+        }
+
+    	Hotel& operator[](int index) {
+    		if (index >= 0 && index < this->nrHoteluri) {
+    			return this->hoteluri[index];
+    		}
+    	}
+        friend istream& operator>>(istream& is, StatiunecuHoteluri& statiune) {
+            cout << "Introduceti numele statiunii: ";
+            is >> statiune.numeStatiune;
+            cout << "Introduceti numarul de hoteluri din statiune: ";
+            is >> statiune.nrHoteluri;
+            delete[]statiune.hoteluri;
+            statiune.hoteluri = new Hotel[statiune.nrHoteluri];
+            for (int i = 0; i < statiune.nrHoteluri; ++i) {
+                cout << "Introduceti detalii pentru Hotelul " << i + 1 << ":\n";
+                is >> statiune.hoteluri[i];
+            }
+
+            return is;
+        }
+
         
-        see << "Detalii Apartament:\n" << *(bloc.apartament);
-        see << "Numar de etaje al blocului: " << bloc.numarEtajeBloc << "\n";
-        see << "Blocul " << (bloc.lift ? "are" : "nu are") << " lift.\n";
+        friend ostream& operator<<(ostream& os, const StatiunecuHoteluri& statiune) {
+            os << "Nume Statiune: " << statiune.numeStatiune << ", Numar Hoteluri: " << statiune.nrHoteluri;
+            for (int i = 0; i < statiune.nrHoteluri; ++i) {
+                os << "\nHotel " << i + 1 << ":\n" << statiune.hoteluri[i];
+            }
 
-        return see;
-    }
-
+            return os;
+        }
 };
+    
+    
+
+
 void main() {
     Apartament::setGradAmenajare(4);
     Casa::setSuprafataCurteMedie(250);
@@ -818,12 +828,15 @@ void main() {
             cout << hotelMatrice[i][j] << "\n";
         }
     }
-Bloc b1;
-cin >> b1;
-cout << b1;
-Bloc b2;
-b2 = b1;
-cout << b2;
+StatiunecuHoteluri s1;
+cin >> s1;
+cout << s1;
+cout << s1[2];
+StatiunecuHoteluri s2;
+s2 = s1;
+cout << s2;
+
+
 
     
 }

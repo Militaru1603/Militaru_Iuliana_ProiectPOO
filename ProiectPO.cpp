@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <fstream>
 using namespace std;
 
 class Apartament {
@@ -351,6 +352,43 @@ public:
     Casa(string adresa):adresa(adresa){}
 
     friend string NouaAdresa(const Casa& casa, const string nouaAdresa);
+
+    friend void afisareBinar(ofstream& out, Casa& casa) {
+        out.write((char*)&casa.etaje, sizeof(int));
+        out.write((char*)&suprafataCurteMedie, sizeof(int));
+
+        int lungimeAdresa = casa.adresa.length();
+        out.write((char*)&lungimeAdresa, sizeof(int));
+        out.write(casa.adresa.c_str(), lungimeAdresa);
+
+        out.write((char*)&casa.anConstructie, sizeof(int));
+        out.write((char*)&casa.numarCamere, sizeof(int));
+        out.write((char*)&casa.suprafataCurte, sizeof(double));
+        for (int i = 0; i < casa.numarCamere; i++) {
+            out.write((char*)&casa.suprafataCurteProprie[i], sizeof(int));
+        }
+    }
+    friend void citireBinar(ifstream& in, Casa& casa) {
+        in.read((char*)&casa.etaje, sizeof(int));
+        in.read((char*)&suprafataCurteMedie, sizeof(int));
+
+        int lungimeAdresa;
+        in.read((char*)&lungimeAdresa, sizeof(int));
+
+        char* bufferAdresa = new char[lungimeAdresa + 1];
+        in.read(bufferAdresa, lungimeAdresa);
+        bufferAdresa[lungimeAdresa] = '\0';
+        casa.adresa = bufferAdresa;
+        delete[] bufferAdresa;
+
+        in.read((char*)&casa.anConstructie, sizeof(int));
+        in.read((char*)&casa.numarCamere, sizeof(int));
+        in.read((char*)&casa.suprafataCurte, sizeof(double));
+
+        for (int i = 0; i < casa.numarCamere; i++) {
+            in.read((char*)&casa.suprafataCurteProprie[i], sizeof(int));
+        }
+    }
 };
 
 string NouaAdresa(const Casa& casa, const string nouaAdresa) {
@@ -836,6 +874,42 @@ StatiunecuHoteluri s2;
 s2 = s1;
 cout << s2;
 
+ofstream fis("casa.bin", ios::binary);
+
+if (fis.is_open()) {
+    Casa casa;
+    cout << "Introduceti detaliile casei:\n";
+    afisareBinar(fis, casa);
+
+    fis.close();
+}
+else {
+    cerr << "Eroare la deschiderea fisierului pentru scriere.\n";
+}
+
+ifstream fiss("casa.bin", ios::binary);
+
+if (fiss.is_open()) {
+    Casa casaCitita;
+    citireBinar(fiss, casaCitita);
+    cout << "\nDetalii Casa Citita:\n";
+    fiss.close();
+}
+else {
+    cerr << "Eroare la deschiderea fisierului pentru citire.\n";
+}
+Casa casa10("Navodari", 2003, 3, 89, new int[3] {5, 6, 7});
+ofstream file1("casa.txt");
+file1 << casa10;
+file1.close();
+
+Casa casa20;
+ifstream file2("casa.txt");
+file2 >> casa20;
+file2.close();
+
+std::cout << "Detalii Casa1:\n" << casa10 << "\n";
+std::cout << "Detalii Casa2:\n" << casa20 << "\n";
 
 
     

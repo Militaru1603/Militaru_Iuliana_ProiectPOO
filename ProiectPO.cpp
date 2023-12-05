@@ -250,25 +250,23 @@ public:
     Casa(const string& adresaCasa, int an, int numarDeCamere, double suprafataCurteCasa, int* suprafataCurteProprieCasa) : adresa(adresaCasa), anConstructie(an), numarCamere(numarDeCamere), suprafataCurte(suprafataCurteCasa) {
         suprafataCurteProprie = new int[numarCamere];
         for (int i = 0; i < numarCamere; i++) {
-            suprafataCurteProprie[i] = suprafataCurteProprieCasa[i];
+            this->suprafataCurteProprie[i] = suprafataCurteProprieCasa[i];
         }
     }
-    Casa(const Casa& p) :etaje(p.etaje) {
-        suprafataCurteMedie = p.suprafataCurteMedie;
-        adresa = p.adresa;
-        anConstructie = p.anConstructie;
-        numarCamere = p.numarCamere;
-        suprafataCurte = p.suprafataCurte;
-        int* suprafataCurteProprie;
+    Casa(const Casa& p) : etaje(p.etaje) {
+        this->adresa = p.adresa;
+        this->anConstructie = p.anConstructie;
+        this->numarCamere = p.numarCamere;
+        this->suprafataCurte = p.suprafataCurte;
         if (numarCamere != 0) {
-            this->suprafataCurteProprie = new int[numarCamere];
-            for (int i = 0; i < numarCamere; i++)
-            {
+            this->suprafataCurteProprie = new int[this->numarCamere];
+            for (int i = 0; i < this->numarCamere; i++) {
                 this->suprafataCurteProprie[i] = p.suprafataCurteProprie[i];
             }
         }
-        else this->suprafataCurteProprie = NULL;
-
+        else {
+            this->suprafataCurteProprie = NULL;  
+        }
     }
 
 
@@ -396,6 +394,51 @@ string NouaAdresa(const Casa& casa, const string nouaAdresa) {
     return nouaAdresa;
 }
 int Casa::suprafataCurteMedie = 300;
+
+class CasaRurala : public Casa {
+private:
+    string zonaGeografica;
+    bool animaleCurte;
+
+public:
+    CasaRurala() : Casa("Navodari",3) {
+        this->zonaGeografica="campie";
+        this->animaleCurte = true;
+    }
+
+    
+    CasaRurala(int nrCamere, string adresa, int anC, double supCurte,
+        string zonaGeografica, bool animaleCurte)
+        : Casa() {
+        this->zonaGeografica = "munte";
+        this->animaleCurte = true;
+        SetNumarCamere(nrCamere);
+        SetAdresa(adresa);
+        SetAnConstructie(anC);
+        SetSuprafataCurte(supCurte);
+    }
+
+    CasaRurala(const CasaRurala& s)
+        : Casa(s) {
+        this->zonaGeografica=s.zonaGeografica;
+        this->animaleCurte=s.animaleCurte;
+    }
+
+    string GetZonaGeografica() const {
+        return zonaGeografica;
+    }
+
+    void SetZonaGeografica(const string& zonaGeografica) {
+        this->zonaGeografica = zonaGeografica;
+    }
+    bool GetAnimaleCurte() const {
+        return animaleCurte;
+    }
+
+    void SetAnimaleCurte(bool animaleCurte) {
+        this->animaleCurte = animaleCurte;
+    }
+};
 
 class Hotel {
 private:
@@ -644,6 +687,37 @@ class StatiunecuHoteluri {
             return os;
         }
 };
+
+class HotelEconomic : public Hotel {
+private:
+    bool micDejunInclus;
+
+public:
+    HotelEconomic() : Hotel("Marina",3) {
+        this->micDejunInclus = false;
+    }
+ 
+    HotelEconomic(string numeHotel, int nrEtaje, bool areRestaurant,
+        const int* camerePeEtaj)
+        : Hotel("Delia", 3, true, new int[3] {2, 3, 4}) {
+        this->micDejunInclus = true;
+
+    }
+    HotelEconomic(const HotelEconomic& s)
+        : Hotel(s) {
+        this->micDejunInclus = s.micDejunInclus;
+    }
+        
+
+    bool GetMicDejunInclus() const {
+        return micDejunInclus;
+    }
+
+    void SetMicDejunInclus(bool micDejunInclus) {
+        this->micDejunInclus = micDejunInclus;
+    }
+};
+
     
     
 
@@ -908,10 +982,24 @@ ifstream file2("casa.txt");
 file2 >> casa20;
 file2.close();
 
-std::cout << "Detalii Casa1:\n" << casa10 << "\n";
-std::cout << "Detalii Casa2:\n" << casa20 << "\n";
+cout << "Detalii Casa1:\n" << casa10 << "\n";
+cout << "Detalii Casa2:\n" << casa20 << "\n";
+
+HotelEconomic hotel100;  
+HotelEconomic hotel200("Economico", 4, true, new int[4] {2, 3, 2, 4});
+HotelEconomic hotel300(hotel200);
+cout << "Nume Hotel 100: " << hotel100.GetNume() << endl;
+cout << "Mic dejun inclus Hotel 200: " << (hotel200.GetMicDejunInclus() ? "Da" : "Nu") << endl;
+cout << "Mic dejun inclus Hotel 300: " << (hotel300.GetMicDejunInclus() ? "Da" : "Nu") << endl;
+
+CasaRurala casaRurala1;
+CasaRurala casaRurala2(3, "Nadoari", 2003, 1200, "munte", true);
+cout << "Informatii pentru casaRurala2:\n";
+cout << "Adresa: " << casaRurala2.GetAdresa() << endl;
+cout << "Zona geografica: " << casaRurala2.GetZonaGeografica() << endl;
+cout << "Animale in curte: " << (casaRurala2.GetAnimaleCurte() ? "Da" : "Nu") << endl;
 
 
-    
+ 
 }
     

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <vector>
 using namespace std;
 
 class Apartament {
@@ -440,7 +441,47 @@ public:
     }
 };
 
-class Hotel {
+class Locatie {
+protected:
+    string adresa;
+    int anConstructie;
+
+public:
+    Locatie() : adresa(""), anConstructie(0) {}
+    Locatie(const string& adresa, int anConstructie) : adresa(adresa), anConstructie(anConstructie) {}
+
+    virtual string GetTipLocatie() const = 0;
+    string GetAdresa() const {
+        return adresa;
+    }
+
+    int GetAnConstructie() const {
+        return anConstructie;
+    }
+};
+
+class SpatiuCazare {
+protected:
+    int numarCamere;
+    double pret;
+
+public:
+    void Afisare() {
+       cout << "Spatiu de cazare generic" << endl;
+    }
+    SpatiuCazare() : numarCamere(0), pret(0.0) {}
+    SpatiuCazare(int numarCamere, double pret) : numarCamere(numarCamere), pret(pret) {}
+    virtual string GetTipSpatiuCazare() const = 0;
+
+    int GetNumarCamere() const {
+        return numarCamere;
+    }
+
+    double GetPret() const {
+        return pret;
+    }
+};
+class Hotel : public Locatie, public SpatiuCazare {
 private:
     const int etaje = 3;
     static int numarCamereMediu;
@@ -449,6 +490,17 @@ private:
     bool restaurant;
     int* CamereEtaj;
 public:
+    
+    Hotel(const string& adresa, int anConstructie, int numarCamere, double pret)
+        : Locatie(adresa, anConstructie), SpatiuCazare(numarCamere, pret) {}
+
+    string GetTipLocatie() const override {
+        return "Hotel";
+    }
+
+    string GetTipSpatiuCazare() const override {
+        return "Camera de hotel";
+    }
     int GetEtaje() const {
         return etaje;
     }
@@ -998,6 +1050,16 @@ cout << "Informatii pentru casaRurala2:\n";
 cout << "Adresa: " << casaRurala2.GetAdresa() << endl;
 cout << "Zona geografica: " << casaRurala2.GetZonaGeografica() << endl;
 cout << "Animale in curte: " << (casaRurala2.GetAnimaleCurte() ? "Da" : "Nu") << endl;
+
+vector<Locatie*> spatiiCazare;
+
+Hotel hotel1;
+Hotel hotel2;
+
+
+spatiiCazare.push_back(&hotel1);
+spatiiCazare.push_back(&hotel2);
+
 
 
  

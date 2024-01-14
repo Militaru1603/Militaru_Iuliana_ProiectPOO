@@ -1024,18 +1024,18 @@ if (fiss.is_open()) {
 else {
     cerr << "Eroare la deschiderea fisierului pentru citire.\n";
 }
-Casa casa10("Navodari", 2003, 3, 89, new int[3] {5, 6, 7});
+Casa casa20("Navodari", 2003, 3, 89, new int[3] {5, 6, 7});
 ofstream file1("casa.txt");
-file1 << casa10;
+file1 << casa20;
 file1.close();
 
-Casa casa20;
+Casa casa30;
 ifstream file2("casa.txt");
-file2 >> casa20;
+file2 >> casa30;
 file2.close();
 
-cout << "Detalii Casa1:\n" << casa10 << "\n";
-cout << "Detalii Casa2:\n" << casa20 << "\n";
+cout << "Detalii Casa1:\n" << casa20 << "\n";
+cout << "Detalii Casa2:\n" << casa30 << "\n";
 
 HotelEconomic hotel100;  
 HotelEconomic hotel200("Economico", 4, true, new int[4] {2, 3, 2, 4});
@@ -1045,7 +1045,11 @@ cout << "Mic dejun inclus Hotel 200: " << (hotel200.GetMicDejunInclus() ? "Da" :
 cout << "Mic dejun inclus Hotel 300: " << (hotel300.GetMicDejunInclus() ? "Da" : "Nu") << endl;
 
 CasaRurala casaRurala1;
-CasaRurala casaRurala2(3, "Nadoari", 2003, 1200, "munte", true);
+cout << "Informatii pentru casaRurala1:\n";
+cout << "Adresa: " << casaRurala1.GetAdresa() << endl;
+cout << "Zona geografica: " << casaRurala1.GetZonaGeografica() << endl;
+cout << "Animale in curte: " << (casaRurala1.GetAnimaleCurte() ? "Da" : "Nu") << endl;
+CasaRurala casaRurala2(3, "Navodari", 2003, 1200, "munte", true);
 cout << "Informatii pentru casaRurala2:\n";
 cout << "Adresa: " << casaRurala2.GetAdresa() << endl;
 cout << "Zona geografica: " << casaRurala2.GetZonaGeografica() << endl;
@@ -1053,12 +1057,12 @@ cout << "Animale in curte: " << (casaRurala2.GetAnimaleCurte() ? "Da" : "Nu") <<
 
 vector<Locatie*> spatiiCazare;
 
-Hotel hotel1;
-Hotel hotel2;
+Hotel hotel23;
+Hotel hotel24;
 
 
-spatiiCazare.push_back(&hotel1);
-spatiiCazare.push_back(&hotel2);
+spatiiCazare.push_back(&hotel23);
+spatiiCazare.push_back(&hotel24);
 
 
 

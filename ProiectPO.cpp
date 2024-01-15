@@ -352,7 +352,7 @@ public:
 
     friend string NouaAdresa(const Casa& casa, const string nouaAdresa);
 
-    friend void afisareBinar(ofstream& out, Casa& casa) {
+    friend void afisareBinar(fstream& out, Casa& casa) {
         out.write((char*)&casa.etaje, sizeof(int));
         out.write((char*)&suprafataCurteMedie, sizeof(int));
 
@@ -367,7 +367,7 @@ public:
             out.write((char*)&casa.suprafataCurteProprie[i], sizeof(int));
         }
     }
-    friend void citireBinar(ifstream& in, Casa& casa) {
+    friend void citireBinar(fstream& in, Casa& casa) {
         in.read((char*)&casa.etaje, sizeof(int));
         in.read((char*)&suprafataCurteMedie, sizeof(int));
 
@@ -441,47 +441,8 @@ public:
     }
 };
 
-class Locatie {
-protected:
-    string adresa;
-    int anConstructie;
 
-public:
-    Locatie() : adresa(""), anConstructie(0) {}
-    Locatie(const string& adresa, int anConstructie) : adresa(adresa), anConstructie(anConstructie) {}
-
-    virtual string GetTipLocatie() const = 0;
-    string GetAdresa() const {
-        return adresa;
-    }
-
-    int GetAnConstructie() const {
-        return anConstructie;
-    }
-};
-
-class SpatiuCazare {
-protected:
-    int numarCamere;
-    double pret;
-
-public:
-    void Afisare() {
-       cout << "Spatiu de cazare generic" << endl;
-    }
-    SpatiuCazare() : numarCamere(0), pret(0.0) {}
-    SpatiuCazare(int numarCamere, double pret) : numarCamere(numarCamere), pret(pret) {}
-    virtual string GetTipSpatiuCazare() const = 0;
-
-    int GetNumarCamere() const {
-        return numarCamere;
-    }
-
-    double GetPret() const {
-        return pret;
-    }
-};
-class Hotel : public Locatie, public SpatiuCazare {
+class Hotel {
 private:
     const int etaje = 3;
     static int numarCamereMediu;
@@ -492,15 +453,9 @@ private:
 public:
     
     Hotel(const string& adresa, int anConstructie, int numarCamere, double pret)
-        : Locatie(adresa, anConstructie), SpatiuCazare(numarCamere, pret) {}
+        {}
 
-    string GetTipLocatie() const override {
-        return "Hotel";
-    }
-
-    string GetTipSpatiuCazare() const override {
-        return "Camera de hotel";
-    }
+    
     int GetEtaje() const {
         return etaje;
     }
@@ -541,15 +496,15 @@ public:
         return CamereEtaj;
     }
 
-    Hotel() : etaje(0), nume(""), numarEtaje(0), restaurant(false), CamereEtaj(nullptr) {
+    Hotel() :etaje(0), nume(""), numarEtaje(0), restaurant(false), CamereEtaj(nullptr) {
 
     }
 
-    Hotel(const string& numeHotel, int numarDeEtaje) : etaje(0), nume(numeHotel), numarEtaje(numarDeEtaje), restaurant(false), CamereEtaj(nullptr) {
+    Hotel(const string& numeHotel, int numarDeEtaje) :  etaje(0), nume(numeHotel), numarEtaje(numarDeEtaje), restaurant(false), CamereEtaj(nullptr) {
 
     }
 
-    Hotel(const string& numeHotel, int numarDeEtaje, bool areRestaurant, int* CamerePeEtaj) : etaje(0), nume(numeHotel), numarEtaje(numarDeEtaje), restaurant(areRestaurant) {
+    Hotel(const string& numeHotel, int numarDeEtaje, bool areRestaurant, int* CamerePeEtaj) :  etaje(0), nume(numeHotel), numarEtaje(numarDeEtaje), restaurant(areRestaurant) {
 
         CamereEtaj = new int[numarEtaje];
         for (int i = 0; i < numarEtaje; i++) {
@@ -602,6 +557,34 @@ public:
 
     ~Hotel() {
         delete CamereEtaj;
+    }
+
+    void citireDinFisBinar(ifstream& f) {
+        f.read(reinterpret_cast<char*>(&this->numarEtaje), sizeof(int));
+        f.read(reinterpret_cast<char*>(&this->restaurant), sizeof(bool));
+
+        
+        this->CamereEtaj = new int[this->numarEtaje];
+        f.read(reinterpret_cast<char*>(this->CamereEtaj), sizeof(int) * this->numarEtaje);
+
+        
+        int numeSize;
+        f.read(reinterpret_cast<char*>(&numeSize), sizeof(int));
+        this->nume.resize(numeSize);
+        f.read(&this->nume[0], numeSize);
+    }
+
+    void scriereInFisBinar(ofstream& g) {
+        g.write(reinterpret_cast<const char*>(&this->numarEtaje), sizeof(int));
+        g.write(reinterpret_cast<const char*>(&this->restaurant), sizeof(bool));
+
+        
+        g.write(reinterpret_cast<const char*>(this->CamereEtaj), sizeof(int) * this->numarEtaje);
+
+        
+        int numeSize = this->nume.size();
+        g.write(reinterpret_cast<const char*>(&numeSize), sizeof(int));
+        g.write(this->nume.c_str(), numeSize);
     }
 
     friend ostream& operator<<(ostream& monitor, const Hotel& hotel) {
@@ -1000,44 +983,48 @@ StatiunecuHoteluri s2;
 s2 = s1;
 cout << s2;
 
-ofstream fis("casa.bin", ios::binary);
 
-if (fis.is_open()) {
-    Casa casa;
-    cout << "Introduceti detaliile casei:\n";
-    afisareBinar(fis, casa);
+Casa c1, c2;
+cin >> c1;
+fstream g1("casa.bin", ios::out | ios::binary);
+afisareBinar(g1,c1);
+g1.close();
 
-    fis.close();
-}
-else {
-    cerr << "Eroare la deschiderea fisierului pentru scriere.\n";
-}
+fstream f1("casa.bin", ios::in | ios::binary);
+citireBinar(f1,c2);
+f1.close();
+cout << c2;
 
-ifstream fiss("casa.bin", ios::binary);
+Hotel hotelScris("Hotel Angelica", 5, true, new int[5] {1, 2, 3, 4, 5});
+ofstream f("hotel.bin", ios::out | ios::binary);
+hotelScris.scriereInFisBinar(f);
+f.close();
 
-if (fiss.is_open()) {
-    Casa casaCitita;
-    citireBinar(fiss, casaCitita);
-    cout << "\nDetalii Casa Citita:\n";
-    fiss.close();
-}
-else {
-    cerr << "Eroare la deschiderea fisierului pentru citire.\n";
-}
-Casa casa20("Navodari", 2003, 3, 89, new int[3] {5, 6, 7});
-ofstream file1("casa.txt");
-file1 << casa20;
-file1.close();
+Hotel hotelCitit;
+ifstream g("hotel.bin", ios::in | ios::binary);
+hotelCitit.citireDinFisBinar(g);
+g.close();
 
-Casa casa30;
-ifstream file2("casa.txt");
-file2 >> casa30;
-file2.close();
+Casa casa20, casa30;
+cin >> casa20;
+ofstream afisare1("casa.txt", ios::out);
+afisare1 << casa20;
+afisare1.close();
+ifstream citire1("casa.txt", ios::in);
+citire1 >> casa30;
+cout << casa30;
+citire1.close();
 
-cout << "Detalii Casa1:\n" << casa20 << "\n";
-cout << "Detalii Casa2:\n" << casa30 << "\n";
+Hotel hotel40, hotel50;
+ofstream afisare2("hotel.txt", ios::out);
+afisare2 << hotel40;
+afisare2.close();
+ifstream citire2("hotel.txt", ios::in);
+citire2 >> hotel50;
+cout << hotel50;
+citire2.close();
 
-HotelEconomic hotel100;  
+HotelEconomic hotel100;
 HotelEconomic hotel200("Economico", 4, true, new int[4] {2, 3, 2, 4});
 HotelEconomic hotel300(hotel200);
 cout << "Nume Hotel 100: " << hotel100.GetNume() << endl;
@@ -1054,17 +1041,6 @@ cout << "Informatii pentru casaRurala2:\n";
 cout << "Adresa: " << casaRurala2.GetAdresa() << endl;
 cout << "Zona geografica: " << casaRurala2.GetZonaGeografica() << endl;
 cout << "Animale in curte: " << (casaRurala2.GetAnimaleCurte() ? "Da" : "Nu") << endl;
-
-vector<Locatie*> spatiiCazare;
-
-Hotel hotel23;
-Hotel hotel24;
-
-
-spatiiCazare.push_back(&hotel23);
-spatiiCazare.push_back(&hotel24);
-
-
 
  
 }
